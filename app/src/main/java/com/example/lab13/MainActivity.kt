@@ -5,6 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -37,14 +39,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Lab13Theme {
-                MeVesYNoMeVes()
+                CambioColorAnimateAsState()
             }
         }
     }
 }
 
 @Composable
-fun MeVesYNoMeVes() {
+fun VisibilidadConAnimatedVisivility() {
     var isVisible by remember { mutableStateOf(false) }
     var boxColor by remember { mutableStateOf(Color.Blue) }
 
@@ -82,5 +84,31 @@ fun MeVesYNoMeVes() {
                     .background(boxColor)
             )
         }
+    }
+}
+
+@Composable
+fun CambioColorAnimateAsState() {
+    var isBlue by remember { mutableStateOf(true) }
+
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isBlue) Color.Blue else Color.Green,
+        animationSpec = tween(durationMillis = 1000)
+    )
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Button(onClick = { isBlue = !isBlue }) {
+            Text("Cambio de color ")
+        }
+
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .background(backgroundColor)
+        )
     }
 }
