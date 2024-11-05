@@ -4,7 +4,10 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
@@ -22,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.lab13.ui.theme.Lab13Theme
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,7 +45,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Lab13Theme {
-                AnimacionTamañoanimateDpAsState()
+                CambioContenido()
             }
         }
     }
@@ -142,4 +146,51 @@ fun AnimacionTamañoanimateDpAsState() {
                 .background(Color.Blue)
         )
     }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun CambioContenido() {
+    var currentState by remember { mutableStateOf(State.Loading) }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Button(onClick = {
+            currentState = when (currentState) {
+                State.Loading -> State.Content
+                State.Content -> State.Error
+                State.Error -> State.Loading
+            }
+        }) {
+            Text("Change State")
+        }
+
+        AnimatedContent(
+            targetState = currentState,
+            transitionSpec = {
+                fadeIn(animationSpec = tween(durationMillis = 500)) with fadeOut(animationSpec = tween(durationMillis = 500))
+            }
+        ) { state ->
+            when (state) {
+                State.Loading -> {
+                    Text("Cargando...", style = MaterialTheme.typography.bodyLarge)
+                }
+                State.Content -> {
+                    Text("Contenido cargado!", style = MaterialTheme.typography.bodyLarge)
+                }
+                State.Error -> {
+                    Text("Ocurrió un error.", style = MaterialTheme.typography.bodyLarge)
+                }
+            }
+        }
+    }
+}
+
+enum class State {
+    Loading,
+    Content,
+    Error
 }
