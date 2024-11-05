@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -39,7 +41,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Lab13Theme {
-                CambioColorAnimateAsState()
+                AnimacionTamañoanimateDpAsState()
             }
         }
     }
@@ -109,6 +111,35 @@ fun CambioColorAnimateAsState() {
             modifier = Modifier
                 .size(100.dp)
                 .background(backgroundColor)
+        )
+    }
+}
+
+@Composable
+fun AnimacionTamañoanimateDpAsState() {
+    var isExpanded by remember { mutableStateOf(false) }
+    var offset by remember { mutableStateOf(0.dp) }
+
+    val size by animateDpAsState(targetValue = if (isExpanded) 150.dp else 100.dp)
+
+    offset = if (isExpanded) 100.dp else 0.dp
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Button(onClick = {
+            isExpanded = !isExpanded
+        }) {
+            Text("Mover y Crecer")
+        }
+
+        Box(
+            modifier = Modifier
+                .size(size)
+                .offset(offset)
+                .background(Color.Blue)
         )
     }
 }
