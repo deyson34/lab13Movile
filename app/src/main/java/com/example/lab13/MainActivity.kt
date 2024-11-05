@@ -27,6 +27,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.with
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.offset
@@ -45,7 +46,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             Lab13Theme {
-                CambioContenido()
+                CombinacionAnimaciones()
             }
         }
     }
@@ -193,4 +194,72 @@ enum class State {
     Loading,
     Content,
     Error
+}
+
+
+
+@Composable
+fun CombinacionAnimaciones() {
+    var isDarkMode by remember { mutableStateOf(false) }
+    var isButtonVisible by remember { mutableStateOf(true) }
+    var boxSize by remember { mutableStateOf(100.dp) } // Tamaño inicial del cuadro
+    var boxColor by remember { mutableStateOf(Color.Blue) } // Color inicial del cuadro
+
+    val animatedColor by animateColorAsState(
+        targetValue = boxColor,
+        animationSpec = tween(durationMillis = 500)
+    )
+
+    val animatedSize by animateDpAsState(
+        targetValue = boxSize,
+        animationSpec = tween(durationMillis = 500)
+    )
+
+    // Color de fondo según el modo
+    val backgroundColor = if (isDarkMode) Color.Black else Color.White
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(backgroundColor)
+    ) {
+        // Cuadro que cambia de tamaño y color
+        Box(
+            modifier = Modifier
+                .size(animatedSize)
+                .background(animatedColor)
+                .clickable {
+                    // Cambiar tamaño y color al hacer clic
+                    if (boxSize == 100.dp) {
+                        boxSize = 150.dp // Cambiar tamaño a 150 dp
+                        boxColor = Color.Green // Cambiar color a verde
+                    } else {
+                        boxSize = 100.dp // Cambiar tamaño de vuelta a 100 dp
+                        boxColor = Color.Blue // Cambiar color a azul
+                    }
+                }
+        )
+
+        // Botón que se desplaza y desaparece
+        AnimatedVisibility(visible = isButtonVisible) {
+            Button(
+                onClick = {
+                    isButtonVisible = false
+                },
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Text("Desaparecer")
+            }
+        }
+
+        // Botón para alternar entre modo claro y oscuro
+        Button(onClick = {
+            isDarkMode = !isDarkMode
+            isButtonVisible = true
+        }) {
+            Text("Alternar Modo")
+        }
+    }
 }
